@@ -1,0 +1,122 @@
+/* ── Keyframes ── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes curtainSway {
+  0%, 100% { transform: skewX(0deg) translateX(0); }
+  30%       { transform: skewX(-1.5deg) translateX(3px); }
+  70%       { transform: skewX(1deg) translateX(-2px); }
+}
+
+@keyframes lampGlow {
+  0%, 100% { opacity: 0.12; }
+  50%       { opacity: 0.20; }
+}
+
+@keyframes steamRise {
+  0%   { transform: translateY(0) scaleX(1);   opacity: 0; }
+  20%  { opacity: 0.35; }
+  80%  { opacity: 0.15; }
+  100% { transform: translateY(-28px) scaleX(1.4); opacity: 0; }
+}
+
+@keyframes blink {
+  0%, 90%, 100% { opacity: 1; }
+  95%            { opacity: 0.2; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { filter: brightness(1); }
+  50%       { filter: brightness(1.3); }
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50%       { transform: translateY(8px); opacity: 0.5; }
+}
+
+/* ── Animações de entrada das seções ── */
+
+.room__content > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+
+.room--active .room__content > *:nth-child(1) { transition-delay: 100ms;  opacity: 1; transform: none; }
+.room--active .room__content > *:nth-child(2) { transition-delay: 280ms;  opacity: 1; transform: none; }
+.room--active .room__content > *:nth-child(3) { transition-delay: 450ms;  opacity: 1; transform: none; }
+.room--active .room__content > *:nth-child(4) { transition-delay: 600ms;  opacity: 1; transform: none; }
+.room--active .room__content > *:nth-child(5) { transition-delay: 750ms;  opacity: 1; transform: none; }
+
+/* Cards com stagger */
+.card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+}
+.room--active .card:nth-child(1) { transition-delay: 500ms; opacity: 1; transform: none; }
+.room--active .card:nth-child(2) { transition-delay: 650ms; opacity: 1; transform: none; }
+.room--active .card:nth-child(3) { transition-delay: 800ms; opacity: 1; transform: none; }
+
+/* SVG da cena */
+.room__scene {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--dur-xslow) var(--ease-out),
+              transform var(--dur-xslow) var(--ease-out);
+  transition-delay: 50ms;
+}
+.room--active .room__scene { opacity: 1; transform: none; }
+
+/* Portal de transição */
+.room__portal {
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+  transition-delay: 400ms;
+}
+.room--active .room__portal { opacity: 1; }
+
+/* ── Elementos decorativos animados ── */
+
+.curtain-left  { animation: curtainSway 6s ease-in-out infinite; transform-origin: top center; }
+.curtain-right { animation: curtainSway 6s ease-in-out infinite reverse; transform-origin: top center; }
+
+.lamp-glow     { animation: lampGlow 3s ease-in-out infinite; }
+.steam         { animation: steamRise 2.5s ease-in-out infinite; }
+.steam:nth-child(2) { animation-delay: 0.8s; animation-duration: 3s; }
+.steam:nth-child(3) { animation-delay: 1.6s; animation-duration: 2.8s; }
+
+.scroll-hint svg { animation: scrollBounce 1.8s ease-in-out infinite; }
+
+.firefly-1 { animation: blink 3.2s ease-in-out infinite; }
+.firefly-2 { animation: blink 4.1s ease-in-out infinite 1.2s; }
+.firefly-3 { animation: blink 2.8s ease-in-out infinite 2s; }
+.firefly-4 { animation: blink 5s ease-in-out infinite 0.5s; }
+
+/* Cortina sutil (sala) */
+.window-glow { animation: lampGlow 4s ease-in-out infinite; }
+
+/* ── prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

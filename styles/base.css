@@ -1,0 +1,110 @@
+:root {
+  /* ── Paleta brand (tons originais) ── */
+  --blush:          #DDB5B0;
+  --mauve:          #B07A7E;
+  --cool-blue:      #6E8FAA;
+  --green:          #96A896;
+  --soft-teal:      #89ABB5;
+  --eucalyptus:     #485870;
+  --dove-gray:      #C2BDB0;
+  --stone:          #A09590;
+  --smoky-plum:     #7A6878;
+  --bonsai-green:   #505846;
+  --cacao:          #5C3530;
+  --warm-choco:     #7C3E35;
+
+  /* ── Backgrounds dos cômodos (tons escurecidos ~35%) ── */
+  --room-fachada:   #0c1220;
+  --room-corredor:  #160e06;
+  --room-sala:      #10121c;
+  --room-atelie:    #100e18;
+  --room-quarto:    #0c0a14;
+  --room-varanda:   #0e1410;
+  --room-cozinha:   #160e08;
+
+  /* ── Superfícies (cards, painéis) ── */
+  --surface-blue:   #1e2a3c;
+  --surface-warm:   #2e1c14;
+  --surface-plum:   #281e30;
+  --surface-green:  #1c2418;
+
+  /* ── Tipografia ── */
+  --text-primary:   #C2BDB0;
+  --text-secondary: #8A8078;
+  --text-heading:   #DDB5B0;
+  --text-bright:    #ECE6DC;
+
+  /* ── Acentos ── */
+  --accent-warm:    #DDB5B0;
+  --accent-mauve:   #B07A7E;
+  --accent-teal:    #89ABB5;
+  --accent-green:   #96A896;
+
+  /* ── Glow e névoa ── */
+  --glow-warm:      rgba(221, 181, 176, 0.14);
+  --glow-teal:      rgba(137, 171, 181, 0.10);
+  --glow-mauve:     rgba(176, 122, 126, 0.12);
+  --fog:            rgba(194, 189, 176, 0.03);
+
+  /* ── Fontes ── */
+  --font-display:   'IM Fell English', serif;
+  --font-heading:   'Cinzel', serif;
+  --font-body:      'Josefin Sans', sans-serif;
+
+  /* ── Espaçamento ── */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px; --sp-16: 64px;
+  --sp-24: 96px;
+
+  /* ── Raio ── */
+  --r-sm: 4px; --r-md: 8px; --r-lg: 16px; --r-xl: 24px;
+
+  /* ── Easing ── */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in:    cubic-bezier(0.64, 0, 0.78, 0);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ── Duração ── */
+  --dur-fast:  200ms;
+  --dur-base:  450ms;
+  --dur-slow:  800ms;
+  --dur-xslow: 1400ms;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: #090810;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+button { border: none; background: none; cursor: pointer; font: inherit; color: inherit; }
+ul, ol { list-style: none; }
+
+/* ── Grain de textura (sutil, Ghibli) ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.032;
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: overlay;
+}
