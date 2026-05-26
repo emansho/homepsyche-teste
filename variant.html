@@ -448,6 +448,14 @@
             .hotspot-label   { font-size: 9px; padding: 5px 13px; letter-spacing: 0.16em; }
             .hotspot-dot     { width: 6px; height: 6px; }
 
+            /* Posições mobile — alinhadas com a imagem portrait */
+            #hs-contact      { top: 22% !important; left: 50% !important; }
+            #hs-services     { top: 43% !important; left: 27% !important; }
+            #hs-portfolio    { top: 41% !important; left: 68% !important; }
+            #hs-about        { top: 62% !important; left: 48% !important; }
+            #hs-process      { top: 65% !important; left: 20% !important; }
+            #hs-testimonials { top: 66% !important; left: 73% !important; }
+
             .audio-toggle  { bottom: 20px; right: 78px; width: 40px; height: 40px; }
             .audio-toggle svg { width: 14px; height: 14px; }
 
@@ -491,33 +499,27 @@
         <!-- Hotspots sobre as janelas da foto.
              Ajuste top/left de cada .hotspot após colocar a foto real. -->
         <div id="hotspots-layer">
-            <!-- Janela mansarda (topo centro) -->
-            <div class="hotspot" data-target="contact"      style="top:13%;left:50%">
+            <div class="hotspot" id="hs-contact"      data-target="contact"      style="top:13%;left:50%">
                 <div class="hotspot-dot"></div>
                 <span class="hotspot-label">Contato</span>
             </div>
-            <!-- Janela superior esquerda (estante de livros) -->
-            <div class="hotspot" data-target="services"     style="top:36%;left:34%">
+            <div class="hotspot" id="hs-services"     data-target="services"     style="top:36%;left:34%">
                 <div class="hotspot-dot"></div>
                 <span class="hotspot-label">Serviços</span>
             </div>
-            <!-- Janela superior direita (bay window âmbar) -->
-            <div class="hotspot" data-target="portfolio"    style="top:36%;left:67%">
+            <div class="hotspot" id="hs-portfolio"    data-target="portfolio"    style="top:36%;left:67%">
                 <div class="hotspot-dot"></div>
                 <span class="hotspot-label">Projetos</span>
             </div>
-            <!-- Janela inferior esquerda (ateliê / pincéis) -->
-            <div class="hotspot" data-target="process"      style="top:72%;left:32%">
+            <div class="hotspot" id="hs-process"      data-target="process"      style="top:72%;left:32%">
                 <div class="hotspot-dot"></div>
                 <span class="hotspot-label">Processo</span>
             </div>
-            <!-- Janela inferior centro (personagem pintando — dona do site) -->
-            <div class="hotspot" data-target="about"        style="top:60%;left:51%">
+            <div class="hotspot" id="hs-about"        data-target="about"        style="top:60%;left:51%">
                 <div class="hotspot-dot"></div>
                 <span class="hotspot-label">Sobre mim</span>
             </div>
-            <!-- Janela inferior direita (tecidos coloridos) -->
-            <div class="hotspot" data-target="testimonials" style="top:62%;left:79%">
+            <div class="hotspot" id="hs-testimonials" data-target="testimonials" style="top:62%;left:79%">
                 <div class="hotspot-dot"></div>
                 <span class="hotspot-label">Inspirações</span>
             </div>
