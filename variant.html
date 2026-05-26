@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Psyche — Design de Interiores</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=IM+Fell+English:ital@0;1&family=Josefin+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <style>
+        :root {
+            --sky-deep:       #07101e;
+            --sky-horizon:    #0d1a32;
+            --house-wall:     #231b0e;
+            --house-dark:     #181208;
+            --roof-dark:      #0e0b05;
+            --glow-amber:     #d4a050;
+            --glow-amber-dim: rgba(212,160,80,0.38);
+            --glow-warm:      #f0b860;
+            --text-light:     #ede0c4;
+            --text-warm:      #d8c8a0;
+            --text-pure:      #fdf6e8;
+            --ui-glass:       rgba(255,255,255,0.04);
+            --ui-border:      rgba(255,255,255,0.10);
+            --panel-bg:       rgba(10,8,5,0.93);
+            --panel-border:   rgba(212,160,80,0.12);
+
+            --font-display: 'Cinzel', serif;
+            --font-body:    'IM Fell English', serif;
+            --font-ui:      'Josefin Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            background: var(--sky-deep);
+            color: var(--text-light);
+            font-family: var(--font-ui);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ── Header ── */
+        .global-header {
+            position: fixed;
+            top: 36px; left: 40px; right: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .logo-cluster {
+            display: flex; align-items: center; gap: 16px;
+            pointer-events: auto; cursor: pointer;
+        }
+        .logo-mark {
+            width: 44px; height: 44px;
+            background: var(--glow-amber);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--house-dark);
+            font-family: var(--font-display);
+            font-size: 18px; font-weight: 500;
+            box-shadow: 0 0 18px rgba(212,160,80,0.35);
+            flex-shrink: 0;
+        }
+        .logo-text-cluster {
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .logo-name {
+            font-family: var(--font-display);
+            font-size: 15px; font-weight: 400;
+            color: var(--text-pure);
+            letter-spacing: 0.14em;
+            line-height: 1;
+        }
+        .logo-tagline {
+            font-size: 8px; text-transform: uppercase;
+            letter-spacing: 0.22em; color: var(--text-warm);
+            opacity: 0.55; line-height: 1;
+        }
+        .nav-links { display: flex; gap: 28px; margin-left: 12px; }
+        .nav-link {
+            font-family: var(--font-display);
+            font-size: 9px; text-transform: uppercase;
+            letter-spacing: 0.28em; color: var(--text-warm);
+            text-decoration: none; opacity: 0.55;
+            transition: opacity 0.3s ease;
+        }
+        .nav-link:hover { opacity: 1; }
+        .nav-controls { display: flex; gap: 12px; pointer-events: auto; }
+        .icon-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            border: 1px solid rgba(212,160,80,0.2);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .icon-btn:hover { background: rgba(212,160,80,0.08); border-color: rgba(212,160,80,0.4); }
+        .icon-btn svg { width: 13px; height: 13px; fill: none; stroke: var(--text-warm); stroke-width: 1.5; opacity: 0.7; }
+
+        /* ── Scene ── */
+        #scene-container {
+            position: absolute; inset: 0;
+            perspective: 1500px;
+            overflow: hidden;
+        }
+
+        /* ── Sky ── */
+        .sky-bg {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 64% 16%, #1b2d52 0%, #0c1828 32%, #07101e 72%);
+            z-index: 0;
+        }
+
+        /* ── Moon ── */
+        .moon {
+            position: absolute;
+            top: 9%; right: 8%;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 36% 34%, #e0dace 0%, #c4bdb0 52%, #a8a098 100%);
+            box-shadow:
+                0 0 0 2px rgba(200,192,176,0.14),
+                0 0 50px rgba(200,192,176,0.22),
+                0 0 100px rgba(200,192,176,0.09);
+            z-index: 12;
+        }
+        .moon::before {
+            content: '';
+            position: absolute;
+            top: 20%; left: 28%;
+            width: 15px; height: 15px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.07);
+        }
+        .moon::after {
+            content: '';
+            position: absolute;
+            top: 52%; left: 60%;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.06);
+        }
+
+        /* ── Stars ── */
+        .stars-layer {
+            position: absolute; inset: 0;
+            z-index: 1; pointer-events: none;
+        }
+
+        /* ── Rain ── */
+        #rain-canvas {
+            position: absolute; inset: 0;
+            z-index: 7; pointer-events: none;
+            opacity: 0.55;
+        }
+
+        /* ── Fireflies ── */
+        @keyframes fireflyPulse {
+            0%,100% { opacity:0; transform:translate(0,0) scale(1); }
+            25%      { opacity:0.9; }
+            50%      { opacity:0.7; transform:translate(var(--ff-dx),var(--ff-dy)) scale(1.3); }
+            75%      { opacity:0.8; }
+        }
+        .ff {
+            position: absolute; border-radius: 50%;
+            background: var(--glow-warm);
+            box-shadow: 0 0 6px 2px rgba(240,184,96,0.55);
+            pointer-events: none; z-index: 8;
+            animation: fireflyPulse var(--ff-dur) var(--ff-del) infinite ease-in-out;
+        }
+
+        /* ── Trees ── */
+        .trees-layer {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 20vh;
+            z-index: 8; pointer-events: none;
+        }
+
+        /* ── Fog ── */
+        .fog-layer {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 28%;
+            background: linear-gradient(to top, rgba(12,18,38,0.55) 0%, transparent 100%);
+            z-index: 11; pointer-events: none;
+        }
+
+        /* ── Ground glow ── */
+        .house-ground-glow {
+            position: absolute;
+            bottom: 18%; left: 50%; transform: translateX(-50%);
+            width: 760px; height: 90px;
+            background: radial-gradient(ellipse at center, rgba(212,160,80,0.10) 0%, transparent 70%);
+            z-index: 9; pointer-events: none;
+            filter: blur(10px);
+        }
+
+        /* ── Facade wrapper — anchored to bottom ── */
+        #facade-wrapper {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            transform-style: preserve-3d;
+            transition: transform 1.8s cubic-bezier(0.25,1,0.15,1);
+            width: 1000px; height: 700px;
+        }
+        #facade-wrapper.zoomed {
+            transform: translateX(-50%) scale(1.07) translateZ(100px);
+        }
+
+        /* ── Roof ── */
+        .house-roof {
+            position: absolute;
+            top: -171px; left: -52px; right: -52px;
+            height: 172px;
+            z-index: 20; pointer-events: none;
+        }
+        .house-roof svg { width: 100%; height: 100%; }
+
+        /* ── Chimney ── */
+        .chimney {
+            position: absolute;
+            top: -130px; left: 70%;
+            width: 32px; height: 92px;
+            background: #261a0c;
+            border: 1px solid rgba(80,50,15,0.45);
+            z-index: 25;
+        }
+        .chimney-cap {
+            position: absolute;
+            top: -7px; left: -7px; right: -7px;
+            height: 9px; background: #1e1208; border-radius: 2px;
+        }
+        @keyframes smokeRise {
+            0%   { opacity:0; transform:translateY(0) translateX(0) scale(0.4); }
+            20%  { opacity:0.55; }
+            80%  { opacity:0.25; }
+            100% { opacity:0; transform:translateY(-55px) translateX(9px) scale(2.8); }
+        }
+        .smoke {
+            position: absolute; border-radius: 50%;
+            background: rgba(140,152,168,0.38);
+            animation: smokeRise 4.5s infinite ease-out;
+        }
+
+        /* ── Facade structure ── */
+        .facade-structure {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(172deg, #2a2016 0%, #1e1a0e 38%, #17130708 100%);
+            border-radius: 4px 4px 8px 8px;
+            box-shadow:
+                0 60px 120px rgba(0,0,0,0.95),
+                inset 0 0 70px rgba(0,0,0,0.5),
+                0 0 0 2px #0f0c06;
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            grid-template-rows: repeat(2,1fr);
+            gap: 60px 80px;
+            padding: 90px 140px;
+            transform-style: preserve-3d;
+        }
+        .facade-structure::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px, transparent 30px,
+                rgba(0,0,0,0.035) 30px, rgba(0,0,0,0.035) 32px
+            );
+            pointer-events: none; border-radius: inherit; z-index: 0;
+        }
+
+        /* ── Facade overlay ── */
+        #facade-overlay {
+            position: absolute; inset: 0;
+            background: #000; opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+            border-radius: inherit; z-index: 20;
+        }
+        #facade-wrapper.zoomed #facade-overlay { opacity: 0.65; }
+
+        /* ── Windows ── */
+        .window-container {
+            position: relative; width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            cursor: pointer; z-index: 15;
+        }
+        .window-frame {
+            position: absolute; inset: 0;
+            background: #0a0806;
+            border-radius: 200px 200px 0 0;
+            box-shadow:
+                inset 0 10px 24px rgba(0,0,0,0.95),
+                0 0 0 6px #1c1508,
+                0 0 0 8px #0a0806,
+                0 5px 14px rgba(0,0,0,0.7);
+            padding: 8px;
+            transform-style: preserve-3d;
+        }
+        .window-frame::before {
+            content: '';
+            position: absolute; inset: -5px;
+            border-radius: 205px 205px 0 0;
+            background: linear-gradient(to bottom, #30241200, #181008);
+            z-index: -1;
+        }
+        .window-interior-glow {
+            position: absolute; inset: 8px;
+            border-radius: 192px 192px 0 0;
+            background: radial-gradient(ellipse at 50% 22%,
+                #fcd878 0%, #e8943800 28%, #c05e1800 58%, #6a280800 82%, #2a100400 100%
+            );
+            opacity: 0.84;
+            transition: opacity 0.6s ease, box-shadow 0.6s ease;
+            box-shadow:
+                0 0 38px rgba(212,148,50,0.48),
+                0 0 72px rgba(212,148,50,0.16),
+                inset 0 -18px 28px rgba(0,0,0,0.62);
+        }
+        .window-container::after {
+            content: '';
+            position: absolute;
+            bottom: -52px; left: 50%; transform: translateX(-50%);
+            width: 72%; height: 52px;
+            background: radial-gradient(ellipse at top, rgba(212,148,50,0.16) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .window-container:hover .window-interior-glow {
+            opacity: 1;
+            box-shadow:
+                0 0 55px rgba(212,148,50,0.55),
+                0 0 95px rgba(212,148,50,0.22),
+                inset 0 -18px 28px rgba(0,0,0,0.62);
+        }
+
+        .pane-wrapper {
+            position: absolute; inset: 8px;
+            border-radius: 192px 192px 0 0;
+            transform-style: preserve-3d;
+            perspective: 800px;
+            pointer-events: none;
+        }
+        .pane {
+            position: absolute; top: 0; width: 50%; height: 100%;
+            background: rgba(18,14,10,0.85);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.15, 1);
+            transform-style: preserve-3d;
+        }
+        .pane.left {
+            left: 0; transform-origin: left center;
+            border-right: 1px solid #000;
+            border-radius: 192px 0 0 0;
+        }
+        .pane.right {
+            right: 0; transform-origin: right center;
+            border-left: 1px solid #000;
+            border-radius: 0 192px 0 0;
+        }
+        .pane-reflection {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, rgba(255,255,255,0.02) 100%);
+            border-radius: inherit;
+        }
+        .pane::after  { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #080604; }
+        .pane::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: #080604; }
+
+        .window-label {
+            position: absolute; bottom: -32px; left: 0; width: 100%;
+            text-align: center; font-size: 10px;
+            letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--text-warm); opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+        .window-container:hover .window-label { opacity: 1; }
+
+        .window-container.is-active { z-index: 50; }
+        .window-container.is-active .pane.left  { transform: rotateY(-82deg); }
+        .window-container.is-active .pane.right { transform: rotateY(82deg); }
+
+        /* ── Interior panels ── */
+        #interiors-container {
+            position: absolute; inset: 0;
+            pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; perspective: 1500px;
+        }
+        .interior-panel {
+            position: absolute;
+            width: 840px; height: 560px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 60px 70px;
+            display: flex; flex-direction: column;
+            opacity: 0; visibility: hidden;
+            transform: rotateX(10deg) translateZ(-60px);
+            transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: none;
+            box-shadow:
+                0 40px 80px rgba(0,0,0,0.85),
+                0 0 120px rgba(212,160,80,0.12),
+                inset 0 0 40px rgba(212,160,80,0.05);
+        }
+        .interior-panel.is-visible {
+            opacity: 1; visibility: visible;
+            transform: rotateX(0deg) translateZ(60px);
+            pointer-events: auto;
+        }
+        .close-panel {
+            position: absolute; top: 24px; right: 24px;
+            width: 44px; height: 44px;
+            background: transparent;
+            border: 1px solid rgba(212,160,80,0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-warm);
+            transition: all 0.4s ease; z-index: 10;
+        }
+        .close-panel:hover {
+            background: rgba(212,160,80,0.1);
+            color: var(--glow-amber);
+            transform: rotate(90deg);
+            border-color: rgba(212,160,80,0.5);
+        }
+        .close-panel svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+
+        .panel-header {
+            margin-bottom: 32px; border-bottom: 1px solid rgba(212,160,80,0.15);
+            padding-bottom: 24px; display: flex; flex-direction: column;
+        }
+        .panel-title {
+            font-family: var(--font-display);
+            font-size: 42px; font-weight: 400;
+            color: var(--text-pure); line-height: 1.1;
+            text-shadow: 0 2px 10px rgba(212,160,80,0.2);
+        }
+        .panel-subtitle {
+            font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em;
+            color: var(--glow-amber); margin-bottom: 12px; display: block;
+        }
+
+        .panel-body { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding-right: 16px; }
+        .panel-body::-webkit-scrollbar { width: 4px; }
+        .panel-body::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        .panel-body::-webkit-scrollbar-thumb { background: rgba(212,160,80,0.2); border-radius: 4px; }
+
+        .prose { font-family: var(--font-body); font-size: 20px; line-height: 1.7; color: var(--text-light); }
+        .prose p { margin-bottom: 1.2em; font-style: italic; }
+        .prose p:first-of-type::first-letter {
+            font-family: var(--font-display); font-size: 3.5em; float: left;
+            line-height: 0.8; padding-right: 8px; color: var(--glow-amber); font-style: normal;
+        }
+
+        /* ── Services grid ── */
+        .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .service-card {
+            border: 1px solid rgba(212,160,80,0.1); padding: 24px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.02), transparent);
+            transition: all 0.3s ease;
+        }
+        .service-card:hover { border-color: rgba(212,160,80,0.3); background: rgba(212,160,80,0.05); transform: translateY(-3px); }
+        .service-title { font-family: var(--font-display); font-size: 18px; color: var(--glow-amber); margin-bottom: 12px; }
+        .service-desc { font-family: var(--font-ui); font-size: 13px; line-height: 1.6; color: #a8a098; }
+
+        /* ── Process grid ── */
+        .process-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+        .process-step { position: relative; padding-left: 48px; }
+        .step-num {
+            position: absolute; left: 0; top: -6px;
+            font-family: var(--font-display); font-size: 32px;
+            color: rgba(212,160,80,0.2); line-height: 1;
+        }
+        .step-title { font-family: var(--font-display); font-size: 16px; color: var(--text-pure); margin-bottom: 8px; }
+        .step-desc { font-family: var(--font-ui); font-size: 13px; color: #a8a098; line-height: 1.5; }
+
+        /* ── Portfolio grid ── */
+        .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .port-item {
+            aspect-ratio: 4/5; background: #1a1510; border: 1px solid rgba(255,255,255,0.05);
+            position: relative; overflow: hidden; cursor: pointer;
+        }
+        .port-item div.img-placeholder { width: 100%; height: 100%; opacity: 0.6; transition: opacity 0.5s, transform 0.8s; }
+        .port-item:hover div.img-placeholder { opacity: 1; transform: scale(1.05); }
+        .port-overlay {
+            position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,8,5,0.9), transparent);
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .port-item:hover .port-overlay { opacity: 1; }
+        .port-title { font-family: var(--font-display); font-size: 14px; color: var(--glow-amber); }
+        .port-cat { font-family: var(--font-ui); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #a8a098; }
+
+        /* ── Testimonials ── */
+        .testi-list { display: flex; flex-direction: column; gap: 32px; }
+        .testi-item { position: relative; padding-left: 24px; border-left: 1px solid rgba(212,160,80,0.2); }
+        .testi-quote { font-family: var(--font-body); font-style: italic; font-size: 20px; color: var(--text-light); line-height: 1.6; margin-bottom: 12px; }
+        .testi-author { font-family: var(--font-ui); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--glow-amber); }
+
+        /* ── Contact ── */
+        .contact-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; }
+        .form-group { margin-bottom: 24px; }
+        .form-label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-warm); margin-bottom: 8px; }
+        .form-input, .form-textarea {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding: 12px 0; color: var(--text-pure); font-family: var(--font-body); font-size: 18px; font-style: italic;
+            transition: border-color 0.3s; resize: none; outline: none;
+        }
+        .form-input:focus, .form-textarea:focus { border-color: var(--glow-amber); }
+        .btn-submit {
+            background: transparent; border: 1px solid var(--glow-amber); color: var(--glow-amber);
+            font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em;
+            padding: 14px 32px; cursor: pointer; transition: all 0.3s; margin-top: 16px;
+        }
+        .btn-submit:hover { background: var(--glow-amber); color: var(--house-dark); }
+
+        .contact-info { display: flex; flex-direction: column; gap: 32px; padding-top: 24px; }
+        .info-block { display: flex; flex-direction: column; gap: 8px; }
+        .info-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: #a8a098; }
+        .info-value { font-family: var(--font-display); font-size: 16px; color: var(--text-pure); }
+    </style>
+</head>
+<body>
+
+    <header class="global-header">
+        <div class="logo-cluster">
+            <div class="logo-mark">H</div>
+            <div class="logo-text-cluster">
+                <span class="logo-name">Home Psyche</span>
+                <span class="logo-tagline">Design de Interiores</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Studio</a>
+                <a href="#" class="nav-link">Journal</a>
+            </div>
+        </div>
+        <div class="nav-controls">
+            <div class="icon-btn">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg>
+            </div>
+            <div class="icon-btn">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"></path></svg>
+            </div>
+        </div>
+    </header>
+
+    <div id="scene-container">
+        <div class="sky-bg"></div>
+        <div class="stars-layer"></div>
+        <div class="moon"></div>
+        <canvas id="rain-canvas"></canvas>
+        <svg class="trees-layer" viewBox="0 0 1440 200" preserveAspectRatio="none">
+            <path fill="#07101e" opacity="0.6" d="M0,200 L0,100 Q50,90 100,120 T250,90 T400,130 T600,80 T800,140 T1000,90 T1200,120 T1440,80 L1440,200 Z"></path>
+            <path fill="#050a12" opacity="0.9" d="M0,200 L0,130 Q80,110 150,150 T350,110 T500,160 T700,110 T950,160 T1150,110 T1440,140 L1440,200 Z"></path>
+        </svg>
+        <div class="fog-layer"></div>
+        <div class="house-ground-glow"></div>
+
+        <div id="facade-wrapper">
+            <div class="house-roof">
+                <svg viewBox="0 0 1104 172" preserveAspectRatio="none">
+                    <path d="M552,0 L1104,172 L0,172 Z" fill="#0e0b05"></path>
+                    <path d="M552,0 L1104,172 L0,172 Z" fill="url(#roof-grad)" opacity="0.3"></path>
+                    <defs>
+                        <linearGradient id="roof-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#2a2016"></stop>
+                            <stop offset="100%" stop-color="#0e0b05" stop-opacity="0"></stop>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+
+            <div class="chimney">
+                <div class="chimney-cap"></div>
+            </div>
+
+            <div class="facade-structure">
+                <div id="facade-overlay"></div>
+
+                <div class="window-container" data-target="about">
+                    <div class="window-frame">
+                        <div class="window-interior-glow"></div>
+                        <div class="pane-wrapper">
+                            <div class="pane left"><div class="pane-reflection"></div></div>
+                            <div class="pane right"><div class="pane-reflection"></div></div>
+                        </div>
+                    </div>
+                    <div class="window-label">About</div>
+                </div>
+
+                <div class="window-container" data-target="services">
+                    <div class="window-frame">
+                        <div class="window-interior-glow"></div>
+                        <div class="pane-wrapper">
+                            <div class="pane left"><div class="pane-reflection"></div></div>
+                            <div class="pane right"><div class="pane-reflection"></div></div>
+                        </div>
+                    </div>
+                    <div class="window-label">Services</div>
+                </div>
+
+                <div class="window-container" data-target="process">
+                    <div class="window-frame">
+                        <div class="window-interior-glow"></div>
+                        <div class="pane-wrapper">
+                            <div class="pane left"><div class="pane-reflection"></div></div>
+                            <div class="pane right"><div class="pane-reflection"></div></div>
+                        </div>
+                    </div>
+                    <div class="window-label">Process</div>
+                </div>
+
+                <div class="window-container" data-target="portfolio">
+                    <div class="window-frame">
+                        <div class="window-interior-glow"></div>
+                        <div class="pane-wrapper">
+                            <div class="pane left"><div class="pane-reflection"></div></div>
+                            <div class="pane right"><div class="pane-reflection"></div></div>
+                        </div>
+                    </div>
+                    <div class="window-label">Portfolio</div>
+                </div>
+
+                <div class="window-container" data-target="testimonials">
+                    <div class="window-frame">
+                        <div class="window-interior-glow"></div>
+                        <div class="pane-wrapper">
+                            <div class="pane left"><div class="pane-reflection"></div></div>
+                            <div class="pane right"><div class="pane-reflection"></div></div>
+                        </div>
+                    </div>
+                    <div class="window-label">Testimonials</div>
+                </div>
+
+                <div class="window-container" data-target="contact">
+                    <div class="window-frame">
+                        <div class="window-interior-glow"></div>
+                        <div class="pane-wrapper">
+                            <div class="pane left"><div class="pane-reflection"></div></div>
+                            <div class="pane right"><div class="pane-reflection"></div></div>
+                        </div>
+                    </div>
+                    <div class="window-label">Contact</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="interiors-container">
+
+            <div class="interior-panel" id="panel-about">
+                <button class="close-panel"><svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <div class="panel-header">
+                    <span class="panel-subtitle">Manifesto</span>
+                    <h2 class="panel-title">Entrar em Casa</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="prose">
+                        <p>Acreditamos que uma casa é a manifestação física da psique. Nossa abordagem vai além da mera estética, mergulhando na ressonância psicológica do espaço, textura e luz.</p>
+                        <p>Despojamos o desnecessário para revelar ambientes que respiram, recalibram e inspiram a mente humana a encontrar seu repouso mais profundo.</p>
+                        <p>Cada sombra é intencional. Cada material é escolhido por sua verdade tátil. Esculpimos ambientes que servem como um cenário silencioso para uma vida extraordinária, onde o design encontra a alma.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interior-panel" id="panel-services">
+                <button class="close-panel"><svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <div class="panel-header">
+                    <span class="panel-subtitle">O que faço</span>
+                    <h2 class="panel-title">Disciplinas</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="services-grid">
+                        <div class="service-card">
+                            <h3 class="service-title">Consultoria</h3>
+                            <p class="service-desc">Avaliação profunda do seu espaço e necessidades psicológicas para estabelecer uma direção visual e emocional clara.</p>
+                        </div>
+                        <div class="service-card">
+                            <h3 class="service-title">Design Psicológico</h3>
+                            <p class="service-desc">Criação de projetos que alinham arquitetura de interiores com princípios de bem-estar cognitivo e repouso mental.</p>
+                        </div>
+                        <div class="service-card">
+                            <h3 class="service-title">Curadoria</h3>
+                            <p class="service-desc">Seleção meticulosa de mobiliário, arte e objetos com significado pessoal e ressonância tátil duradoura.</p>
+                        </div>
+                        <div class="service-card">
+                            <h3 class="service-title">Iluminação</h3>
+                            <p class="service-desc">Estudos de luz natural e artificial projetados para respeitar o ciclo circadiano e criar atmosferas variáveis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interior-panel" id="panel-process">
+                <button class="close-panel"><svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <div class="panel-header">
+                    <span class="panel-subtitle">Diagnóstico</span>
+                    <h2 class="panel-title">O Método</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="process-grid">
+                        <div class="process-step">
+                            <span class="step-num">01</span>
+                            <h3 class="step-title">Descoberta</h3>
+                            <p class="step-desc">Mergulho nas suas rotinas, memórias espaciais e aspirações de conforto. Entendemos a essência do habitante.</p>
+                        </div>
+                        <div class="process-step">
+                            <span class="step-num">02</span>
+                            <h3 class="step-title">Sintonia</h3>
+                            <p class="step-desc">Tradução dos insights psicológicos em conceitos táteis, paletas de cores e distribuições espaciais.</p>
+                        </div>
+                        <div class="process-step">
+                            <span class="step-num">03</span>
+                            <h3 class="step-title">Composição</h3>
+                            <p class="step-desc">Detalhamento técnico rigoroso. Cada milímetro é planejado para harmonia absoluta entre forma e emoção.</p>
+                        </div>
+                        <div class="process-step">
+                            <span class="step-num">04</span>
+                            <h3 class="step-title">Materialização</h3>
+                            <p class="step-desc">Acompanhamento meticuloso da execução, garantindo que a atmosfera imaginada se torne realidade tangível.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interior-panel" id="panel-portfolio">
+                <button class="close-panel"><svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <div class="panel-header">
+                    <span class="panel-subtitle">Projetos</span>
+                    <h2 class="panel-title">Arquivos</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="portfolio-grid">
+                        <div class="port-item">
+                            <div class="img-placeholder" style="background: #2a2016;"></div>
+                            <div class="port-overlay">
+                                <span class="port-cat">Residencial</span>
+                                <h3 class="port-title">Refúgio Âmbar</h3>
+                            </div>
+                        </div>
+                        <div class="port-item">
+                            <div class="img-placeholder" style="background: #1e1a0e;"></div>
+                            <div class="port-overlay">
+                                <span class="port-cat">Comercial</span>
+                                <h3 class="port-title">Clínica Sereno</h3>
+                            </div>
+                        </div>
+                        <div class="port-item">
+                            <div class="img-placeholder" style="background: #171307;"></div>
+                            <div class="port-overlay">
+                                <span class="port-cat">Residencial</span>
+                                <h3 class="port-title">Casa Sombra</h3>
+                            </div>
+                        </div>
+                        <div class="port-item">
+                            <div class="img-placeholder" style="background: #3a2e24;"></div>
+                            <div class="port-overlay">
+                                <span class="port-cat">Hospitalidade</span>
+                                <h3 class="port-title">Pousada Vento</h3>
+                            </div>
+                        </div>
+                        <div class="port-item">
+                            <div class="img-placeholder" style="background: #231b0e;"></div>
+                            <div class="port-overlay">
+                                <span class="port-cat">Residencial</span>
+                                <h3 class="port-title">Loft Tátil</h3>
+                            </div>
+                        </div>
+                        <div class="port-item">
+                            <div class="img-placeholder" style="background: #181208;"></div>
+                            <div class="port-overlay">
+                                <span class="port-cat">Intervenção</span>
+                                <h3 class="port-title">Estúdio Silêncio</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interior-panel" id="panel-testimonials">
+                <button class="close-panel"><svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <div class="panel-header">
+                    <span class="panel-subtitle">Depoimentos</span>
+                    <h2 class="panel-title">Ecos</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="testi-list">
+                        <div class="testi-item">
+                            <p class="testi-quote">"O espaço que criaram não apenas mudou como vivemos, mas como sentimos. Há uma calma indescritível que nos envolve assim que passamos pela porta."</p>
+                            <span class="testi-author">— Mariana V., Casa Sombra</span>
+                        </div>
+                        <div class="testi-item">
+                            <p class="testi-quote">"Nunca entendi verdadeiramente o impacto da textura e da luz natural até viver na arquitetura psicológica desenhada pelo estúdio. É transformador."</p>
+                            <span class="testi-author">— Tomás R., Loft Tátil</span>
+                        </div>
+                        <div class="testi-item">
+                            <p class="testi-quote">"Eles conseguiram traduzir nossa história familiar em formas e materiais. A casa conta quem somos sem dizer uma única palavra."</p>
+                            <span class="testi-author">— Família Albuquerque</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interior-panel" id="panel-contact">
+                <button class="close-panel"><svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                <div class="panel-header">
+                    <span class="panel-subtitle">Inicie</span>
+                    <h2 class="panel-title">Diálogo</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="contact-layout">
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Nome</label>
+                                <input type="text" class="form-input" placeholder="Como devemos chamá-lo?">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" placeholder="Para onde enviamos nossa resposta?">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mensagem</label>
+                                <textarea class="form-textarea" rows="3" placeholder="Conte-nos sobre o espaço..."></textarea>
+                            </div>
+                            <button type="button" class="btn-submit">Enviar Mensagem</button>
+                        </form>
+                        <div class="contact-info">
+                            <div class="info-block">
+                                <span class="info-label">Localização</span>
+                                <span class="info-value">São Paulo, BR</span>
+                            </div>
+                            <div class="info-block">
+                                <span class="info-label">Email</span>
+                                <span class="info-value">studio@homepsyche.com</span>
+                            </div>
+                            <div class="info-block">
+                                <span class="info-label">Instagram</span>
+                                <span class="info-value">@home.psyche</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            /* Stars */
+            const starsLayer = document.querySelector('.stars-layer');
+            for(let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.style.cssText = `position:absolute;left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*2+1}px;height:${Math.random()*2+1}px;background:#fff;border-radius:50%;opacity:${Math.random()*0.8+0.2}`;
+                starsLayer.appendChild(star);
+            }
+
+            /* Fireflies */
+            const sceneContainer = document.getElementById('scene-container');
+            for(let i = 0; i < 40; i++) {
+                const ff = document.createElement('div');
+                ff.className = 'ff';
+                ff.style.left   = `${Math.random()*100}%`;
+                ff.style.top    = `${50 + Math.random()*50}%`;
+                ff.style.width  = ff.style.height = `${Math.random()*3+1}px`;
+                ff.style.setProperty('--ff-dx',  `${(Math.random()-0.5)*100}px`);
+                ff.style.setProperty('--ff-dy',  `${(Math.random()-0.5)*100}px`);
+                ff.style.setProperty('--ff-dur', `${3+Math.random()*4}s`);
+                ff.style.setProperty('--ff-del', `${Math.random()*5}s`);
+                sceneContainer.appendChild(ff);
+            }
+
+            /* Chimney smoke */
+            const chimney = document.querySelector('.chimney');
+            setInterval(() => {
+                const smoke = document.createElement('div');
+                smoke.className = 'smoke';
+                smoke.style.width  = smoke.style.height = `${Math.random()*10+10}px`;
+                smoke.style.left   = `${Math.random()*10+5}px`;
+                smoke.style.top    = '-10px';
+                chimney.appendChild(smoke);
+                setTimeout(() => smoke.remove(), 4500);
+            }, 800);
+
+            /* Rain */
+            const canvas = document.getElementById('rain-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height, particles = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            function initRain() {
+                particles = [];
+                for(let i = 0; i < 150; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        length:  Math.random() * 20 + 10,
+                        speed:   Math.random() * 15 + 10,
+                        opacity: Math.random() * 0.3 + 0.1
+                    });
+                }
+            }
+            function drawRain() {
+                ctx.clearRect(0, 0, width, height);
+                ctx.lineWidth = 1;
+                ctx.lineCap = 'round';
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x - p.length * 0.2, p.y + p.length);
+                    const grad = ctx.createLinearGradient(p.x, p.y, p.x - p.length*0.2, p.y + p.length);
+                    grad.addColorStop(0,   `rgba(255,255,255,0)`);
+                    grad.addColorStop(0.5, `rgba(212,160,80,${p.opacity})`);
+                    grad.addColorStop(1,   `rgba(255,255,255,0)`);
+                    ctx.strokeStyle = grad;
+                    ctx.stroke();
+                    p.y += p.speed;
+                    p.x -= p.speed * 0.2;
+                    if(p.y > height) { p.y = -p.length; p.x = Math.random() * width; }
+                });
+                requestAnimationFrame(drawRain);
+            }
+            window.addEventListener('resize', () => { resize(); initRain(); });
+            resize(); initRain(); drawRain();
+
+            /* Window interactions */
+            const facadeWrapper = document.getElementById('facade-wrapper');
+            const windows       = document.querySelectorAll('.window-container');
+            const closeBtns     = document.querySelectorAll('.close-panel');
+            let isAnimating = false;
+            let activeWindow = null;
+
+            windows.forEach(win => {
+                win.addEventListener('click', () => {
+                    if(isAnimating || activeWindow) return;
+                    isAnimating = true;
+                    activeWindow = win;
+
+                    const targetId = win.getAttribute('data-target');
+                    const panel = document.getElementById(`panel-${targetId}`);
+
+                    win.classList.add('is-active');
+                    facadeWrapper.classList.add('zoomed');
+
+                    setTimeout(() => {
+                        if(panel) panel.classList.add('is-visible');
+                        isAnimating = false;
+                    }, 800);
+                });
+            });
+
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if(isAnimating) return;
+                    isAnimating = true;
+
+                    const panel = e.target.closest('.interior-panel');
+                    panel.classList.remove('is-visible');
+
+                    setTimeout(() => {
+                        facadeWrapper.classList.remove('zoomed');
+                        if(activeWindow) {
+                            activeWindow.classList.remove('is-active');
+                            activeWindow = null;
+                        }
+                        isAnimating = false;
+                    }, 500);
+                });
+            });
+
+            /* Parallax tilt — preserves translateX(-50%) base */
+            document.addEventListener('mousemove', (e) => {
+                if(activeWindow) return;
+                const xAxis = (window.innerWidth  / 2 - e.pageX) / 80;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 80;
+                facadeWrapper.style.transform = `translateX(-50%) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+
+            document.addEventListener('mouseleave', () => {
+                if(!activeWindow) facadeWrapper.style.transform = 'translateX(-50%) rotateY(0deg) rotateX(0deg)';
+            });
+        });
+    </script>
+
+</body>
+</html>
