@@ -531,7 +531,7 @@
 
         <!-- Áudio ambiente. Coloque chuva.mp3 na mesma pasta.
              O botão abaixo controla play/pause. Não inicia sozinho (política dos navegadores). -->
-        <audio id="ambient-audio" loop src="./chuva.mp3" preload="none"></audio>
+        <audio id="ambient-audio" loop src="./rain.mp3" preload="none"></audio>
 
         <!-- Painéis de conteúdo -->
         <div id="interiors-container">
@@ -733,12 +733,17 @@
         </div>
     </div>
 
-    <!-- Botão de áudio ambiente -->
-    <button class="audio-toggle" id="audio-toggle" title="Som ambiente" aria-label="Ativar som ambiente">
-        <svg id="icon-sound-on" viewBox="0 0 24 24">
+    <!-- Botão de áudio: mostra speaker-on ou speaker-off conforme mute -->
+    <button class="audio-toggle" id="audio-toggle" title="Mutar som" aria-label="Mutar som ambiente">
+        <svg class="icon-on" viewBox="0 0 24 24" style="display:none">
             <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <svg class="icon-off" viewBox="0 0 24 24">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
         </svg>
     </button>
 
@@ -867,17 +872,42 @@
                 });
             });
 
-            /* ── Audio toggle ── */
+            /* ── Audio — toca automático, botão muta/desmuta ── */
             const audio    = document.getElementById('ambient-audio');
             const audioBtn = document.getElementById('audio-toggle');
-            audioBtn.addEventListener('click', () => {
-                if (audio.paused) {
-                    audio.play().catch(() => {});
-                    audioBtn.classList.add('is-playing');
-                } else {
-                    audio.pause();
-                    audioBtn.classList.remove('is-playing');
-                }
+
+            const iconOn  = audioBtn.querySelector('.icon-on');
+            const iconOff = audioBtn.querySelector('.icon-off');
+
+            function setAudioUI(playing) {
+                iconOn.style.display  = playing ? 'block' : 'none';
+                iconOff.style.display = playing ? 'none'  : 'block';
+                audioBtn.classList.toggle('is-playing', playing);
+            }
+
+            function startAudio() {
+                audio.play().then(() => {
+                    setAudioUI(true);
+                }).catch(() => {});
+            }
+
+            /* Tenta autoplay imediatamente */
+            startAudio();
+
+            /* Se bloqueado, inicia no primeiro toque/clique do usuário */
+            function onFirstInteraction() {
+                startAudio();
+                document.removeEventListener('click', onFirstInteraction);
+                document.removeEventListener('touchstart', onFirstInteraction);
+            }
+            document.addEventListener('click', onFirstInteraction);
+            document.addEventListener('touchstart', onFirstInteraction);
+
+            /* Botão alterna mute/unmute */
+            audioBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                audio.muted = !audio.muted;
+                setAudioUI(!audio.muted);
             });
         });
     </script>
