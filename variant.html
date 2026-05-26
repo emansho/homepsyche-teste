@@ -203,6 +203,7 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
+            transform-origin: bottom center;
             z-index: 10;
             transform-style: preserve-3d;
             transition: transform 1.8s cubic-bezier(0.25,1,0.15,1);
@@ -527,6 +528,68 @@
         .info-block { display: flex; flex-direction: column; gap: 8px; }
         .info-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: #a8a098; }
         .info-value { font-family: var(--font-display); font-size: 16px; color: var(--text-pure); }
+        /* ── WhatsApp FAB ── */
+        .whatsapp-fab {
+            position: fixed;
+            bottom: 28px; right: 28px;
+            width: 56px; height: 56px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 200;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(37,211,102,0.40);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: waPulse 3s ease-in-out infinite;
+        }
+        .whatsapp-fab:hover {
+            transform: scale(1.12);
+            box-shadow: 0 6px 30px rgba(37,211,102,0.65);
+            animation: none;
+        }
+        .whatsapp-fab svg { width: 28px; height: 28px; fill: #fff; }
+        @keyframes waPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(37,211,102,0.40); }
+            50%       { box-shadow: 0 4px 30px rgba(37,211,102,0.75), 0 0 0 10px rgba(37,211,102,0.07); }
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 767px) {
+            .global-header {
+                top: 20px; left: 18px; right: 18px;
+            }
+            .logo-tagline { display: none; }
+            .nav-links    { display: none; }
+            .nav-controls { display: none; }
+
+            .moon {
+                width: 58px; height: 58px;
+                top: 7%; right: 5%;
+            }
+
+            .interior-panel {
+                width: 100vw;
+                height: 100dvh;
+                border-radius: 0;
+                padding: 56px 22px 28px;
+                position: fixed;
+                top: 0; left: 0;
+                transform: translateY(40px) !important;
+            }
+            .interior-panel.is-visible {
+                transform: translateY(0) !important;
+            }
+            .panel-title   { font-size: 26px; }
+            .prose         { font-size: 16px; }
+            .services-grid { grid-template-columns: 1fr; }
+            .process-grid  { grid-template-columns: 1fr; gap: 20px; }
+            .portfolio-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .contact-layout { grid-template-columns: 1fr; gap: 28px; }
+            .testi-quote   { font-size: 17px; }
+
+            .whatsapp-fab { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+            .whatsapp-fab svg { width: 24px; height: 24px; }
+        }
     </style>
 </head>
 <body>
@@ -853,6 +916,12 @@
         </div>
     </div>
 
+    <a class="whatsapp-fab" href="https://wa.me/5511947190354" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+    </a>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -935,12 +1004,26 @@
             window.addEventListener('resize', () => { resize(); initRain(); });
             resize(); initRain(); drawRain();
 
-            /* Window interactions */
+            /* ── Responsive facade scale ── */
             const facadeWrapper = document.getElementById('facade-wrapper');
             const windows       = document.querySelectorAll('.window-container');
             const closeBtns     = document.querySelectorAll('.close-panel');
-            let isAnimating = false;
+            let isAnimating  = false;
             let activeWindow = null;
+            let facadeScale  = 1;
+            const isTouch = ('ontouchstart' in window) || window.matchMedia('(pointer: coarse)').matches;
+
+            function updateFacadeScale() {
+                const vw = window.innerWidth;
+                if      (vw < 480) facadeScale = Math.max(0.28, (vw * 0.90) / 1000);
+                else if (vw < 768) facadeScale = 0.68;
+                else               facadeScale = 1;
+                if (!activeWindow) applyBaseTransform();
+            }
+
+            function applyBaseTransform() {
+                facadeWrapper.style.transform = `translateX(-50%) scale(${facadeScale})`;
+            }
 
             windows.forEach(win => {
                 win.addEventListener('click', () => {
@@ -952,7 +1035,7 @@
                     const panel = document.getElementById(`panel-${targetId}`);
 
                     win.classList.add('is-active');
-                    facadeWrapper.classList.add('zoomed');
+                    facadeWrapper.style.transform = `translateX(-50%) scale(${facadeScale * 1.05}) translateZ(80px)`;
 
                     setTimeout(() => {
                         if(panel) panel.classList.add('is-visible');
@@ -970,27 +1053,31 @@
                     panel.classList.remove('is-visible');
 
                     setTimeout(() => {
-                        facadeWrapper.classList.remove('zoomed');
                         if(activeWindow) {
                             activeWindow.classList.remove('is-active');
                             activeWindow = null;
                         }
+                        applyBaseTransform();
                         isAnimating = false;
                     }, 500);
                 });
             });
 
-            /* Parallax tilt — preserves translateX(-50%) base */
-            document.addEventListener('mousemove', (e) => {
-                if(activeWindow) return;
-                const xAxis = (window.innerWidth  / 2 - e.pageX) / 80;
-                const yAxis = (window.innerHeight / 2 - e.pageY) / 80;
-                facadeWrapper.style.transform = `translateX(-50%) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-            });
+            /* Parallax — only on pointer devices */
+            if (!isTouch) {
+                document.addEventListener('mousemove', (e) => {
+                    if(activeWindow) return;
+                    const xAxis = (window.innerWidth  / 2 - e.pageX) / 80;
+                    const yAxis = (window.innerHeight / 2 - e.pageY) / 80;
+                    facadeWrapper.style.transform = `translateX(-50%) scale(${facadeScale}) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+                document.addEventListener('mouseleave', () => {
+                    if(!activeWindow) applyBaseTransform();
+                });
+            }
 
-            document.addEventListener('mouseleave', () => {
-                if(!activeWindow) facadeWrapper.style.transform = 'translateX(-50%) rotateY(0deg) rotateX(0deg)';
-            });
+            window.addEventListener('resize', () => { resize(); initRain(); updateFacadeScale(); });
+            updateFacadeScale();
         });
     </script>
 
