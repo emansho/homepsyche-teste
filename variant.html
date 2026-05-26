@@ -7,25 +7,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=IM+Fell+English:ital@0;1&family=Josefin+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <style>
         :root {
-            --sky-deep:       #07101e;
-            --sky-horizon:    #0d1a32;
-            --house-wall:     #231b0e;
-            --house-dark:     #181208;
-            --roof-dark:      #0e0b05;
-            --glow-amber:     #d4a050;
-            --glow-amber-dim: rgba(212,160,80,0.38);
-            --glow-warm:      #f0b860;
-            --text-light:     #ede0c4;
-            --text-warm:      #d8c8a0;
-            --text-pure:      #fdf6e8;
-            --ui-glass:       rgba(255,255,255,0.04);
-            --ui-border:      rgba(255,255,255,0.10);
-            --panel-bg:       rgba(10,8,5,0.93);
-            --panel-border:   rgba(212,160,80,0.12);
-
+            --glow-amber:   #d4a050;
+            --glow-warm:    #f0b860;
+            --text-light:   #ede0c4;
+            --text-warm:    #d8c8a0;
+            --text-pure:    #fdf6e8;
+            --panel-bg:     rgba(10,8,5,0.94);
+            --panel-border: rgba(212,160,80,0.12);
             --font-display: 'Cinzel', serif;
             --font-body:    'IM Fell English', serif;
             --font-ui:      'Josefin Sans', sans-serif;
@@ -34,22 +24,101 @@
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
         body {
-            background: var(--sky-deep);
+            background: #05080f;
             color: var(--text-light);
             font-family: var(--font-ui);
             overflow: hidden;
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; width: 100vw;
         }
 
-        /* ── Header ── */
+        /* ─── Scene ─── */
+        #scene-container {
+            position: absolute; inset: 0;
+            overflow: hidden;
+        }
+
+        /* ─── Photo background ───
+           Substitua './casa.jpg' pelo caminho real da foto enviada pela cliente.
+           background-position: ajuste conforme necessário para enquadrar bem a fachada. */
+        .photo-bg {
+            position: absolute; inset: 0;
+            background-image: url('./casa.jpg');
+            background-size: cover;
+            background-position: center 10%;
+            z-index: 0;
+            transform-origin: center center;
+            transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .photo-bg.zoomed { transform: scale(1.1); }
+        .photo-bg::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(3,6,14,0.38) 0%,
+                rgba(3,6,14,0.10) 45%,
+                rgba(3,6,14,0.52) 100%
+            );
+            pointer-events: none;
+        }
+
+        /* ─── Bloom (efeito clique na janela) ─── */
+        .bloom {
+            position: fixed;
+            border-radius: 50%;
+            width: 200vmax; height: 200vmax;
+            background: radial-gradient(circle,
+                rgba(212,160,80,0.45) 0%,
+                rgba(212,160,80,0.18) 35%,
+                transparent 65%
+            );
+            pointer-events: none;
+            z-index: 20;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition:
+                transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity   0.75s ease;
+        }
+        .bloom.expanding {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .bloom.fading {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* ─── Rain ─── */
+        #rain-canvas {
+            position: absolute; inset: 0;
+            z-index: 5; pointer-events: none;
+            opacity: 0.65;
+        }
+
+        /* ─── Fireflies ─── */
+        @keyframes fireflyPulse {
+            0%,100% { opacity: 0; transform: translate(0,0) scale(1); }
+            25%     { opacity: 0.85; }
+            50%     { opacity: 0.65; transform: translate(var(--ff-dx),var(--ff-dy)) scale(1.35); }
+            75%     { opacity: 0.75; }
+        }
+        .ff {
+            position: absolute; border-radius: 50%;
+            background: var(--glow-warm);
+            box-shadow: 0 0 6px 2px rgba(240,184,96,0.5);
+            pointer-events: none; z-index: 6;
+            animation: fireflyPulse var(--ff-dur) var(--ff-del) infinite ease-in-out;
+        }
+
+        /* ─── Header ─── */
         .global-header {
             position: fixed;
             top: 36px; left: 40px; right: 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 100;
+            z-index: 50;
             pointer-events: none;
         }
         .logo-cluster {
@@ -61,7 +130,7 @@
             background: var(--glow-amber);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: var(--house-dark);
+            color: #181208;
             font-family: var(--font-display);
             font-size: 18px; font-weight: 500;
             box-shadow: 0 0 18px rgba(212,160,80,0.35);
@@ -74,322 +143,155 @@
             font-family: var(--font-display);
             font-size: 15px; font-weight: 400;
             color: var(--text-pure);
-            letter-spacing: 0.14em;
-            line-height: 1;
+            letter-spacing: 0.14em; line-height: 1;
         }
         .logo-tagline {
             font-size: 8px; text-transform: uppercase;
-            letter-spacing: 0.22em; color: var(--text-warm);
-            opacity: 0.55; line-height: 1;
+            letter-spacing: 0.22em;
+            color: var(--text-warm); opacity: 0.55; line-height: 1;
         }
-        .nav-links { display: flex; gap: 28px; margin-left: 12px; }
-        .nav-link {
+
+        /* ─── Welcome overlay ─── */
+        .welcome-overlay {
+            position: absolute;
+            top: 8%; left: 4%;
+            z-index: 8;
+            pointer-events: none;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .welcome-pre {
+            font-family: var(--font-ui);
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.35em;
+            color: var(--text-warm);
+            text-shadow: 0 1px 10px rgba(0,0,0,0.9);
+        }
+        .welcome-title {
             font-family: var(--font-display);
-            font-size: 9px; text-transform: uppercase;
-            letter-spacing: 0.28em; color: var(--text-warm);
-            text-decoration: none; opacity: 0.55;
-            transition: opacity 0.3s ease;
+            font-size: 38px; font-weight: 400;
+            color: var(--text-pure);
+            text-shadow: 0 2px 28px rgba(0,0,0,0.95);
+            line-height: 1.1;
         }
-        .nav-link:hover { opacity: 1; }
-        .nav-controls { display: flex; gap: 12px; pointer-events: auto; }
-        .icon-btn {
-            width: 38px; height: 38px; border-radius: 50%;
-            border: 1px solid rgba(212,160,80,0.2);
+
+        /* ─── Hotspots ───
+           Cada .hotspot tem top/left inline em % — fácil de ajustar
+           para alinhar com as janelas reais da foto. */
+        #hotspots-layer {
+            position: absolute; inset: 0;
+            z-index: 10; pointer-events: none;
+        }
+        .hotspot {
+            position: absolute;
+            pointer-events: auto; cursor: pointer;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 6px;
+            transform: translate(-50%, -50%);
+        }
+        .hotspot-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--glow-amber);
+            box-shadow: 0 0 10px rgba(212,160,80,0.8);
+            animation: dotPulse 2.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes dotPulse {
+            0%,100% { box-shadow: 0 0 8px rgba(212,160,80,0.7); transform: scale(1); }
+            50%     { box-shadow: 0 0 20px rgba(212,160,80,0.9), 0 0 0 8px rgba(212,160,80,0.07); transform: scale(1.18); }
+        }
+        .hotspot-label {
+            background: rgba(6,4,2,0.60);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(212,160,80,0.32);
+            border-radius: 999px;
+            padding: 6px 18px;
+            font-family: var(--font-ui);
+            font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.22em;
+            color: var(--text-warm);
+            white-space: nowrap;
+            transition: all 0.28s ease;
+            pointer-events: none;
+        }
+        .hotspot:hover .hotspot-dot { animation-play-state: paused; }
+        .hotspot:hover .hotspot-label {
+            background: rgba(212,160,80,0.14);
+            border-color: rgba(212,160,80,0.65);
+            color: var(--text-pure);
+        }
+        .hotspot.is-active .hotspot-label {
+            background: rgba(212,160,80,0.18);
+            border-color: var(--glow-amber);
+            color: var(--glow-amber);
+        }
+
+        /* ─── Character slot ───
+           Div reservado para o personagem animado (vídeo WebM ou Lottie).
+           Posicione sobre a janela correta da foto quando o asset estiver pronto.
+           Por padrão está escondido até o asset ser fornecido. */
+        #character-slot {
+            position: absolute;
+            display: none; /* ativar quando asset estiver pronto */
+            z-index: 9;
+            pointer-events: none;
+        }
+
+        /* ─── Audio toggle ─── */
+        .audio-toggle {
+            position: fixed;
+            bottom: 28px; right: 96px;
+            width: 44px; height: 44px;
+            background: rgba(6,4,2,0.58);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(212,160,80,0.20);
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s ease;
+            cursor: pointer; z-index: 200;
+            transition: all 0.3s ease;
         }
-        .icon-btn:hover { background: rgba(212,160,80,0.08); border-color: rgba(212,160,80,0.4); }
-        .icon-btn svg { width: 13px; height: 13px; fill: none; stroke: var(--text-warm); stroke-width: 1.5; opacity: 0.7; }
-
-        /* ── Scene ── */
-        #scene-container {
-            position: absolute; inset: 0;
-            perspective: 1500px;
-            overflow: hidden;
+        .audio-toggle:hover {
+            background: rgba(212,160,80,0.08);
+            border-color: rgba(212,160,80,0.45);
         }
-
-        /* ── Sky ── */
-        .sky-bg {
-            position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 64% 16%, #1b2d52 0%, #0c1828 32%, #07101e 72%);
-            z-index: 0;
+        .audio-toggle.is-playing { border-color: rgba(212,160,80,0.55); }
+        .audio-toggle svg {
+            width: 16px; height: 16px;
+            fill: none; stroke: var(--text-warm);
+            stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+            transition: stroke 0.3s;
         }
+        .audio-toggle.is-playing svg { stroke: var(--glow-amber); }
 
-        /* ── Moon ── */
-        .moon {
-            position: absolute;
-            top: 9%; right: 8%;
-            width: 90px; height: 90px;
+        /* ─── WhatsApp FAB ─── */
+        .whatsapp-fab {
+            position: fixed;
+            bottom: 28px; right: 28px;
+            width: 56px; height: 56px;
+            background: #25D366;
             border-radius: 50%;
-            background: radial-gradient(circle at 36% 34%, #e0dace 0%, #c4bdb0 52%, #a8a098 100%);
-            box-shadow:
-                0 0 0 2px rgba(200,192,176,0.14),
-                0 0 50px rgba(200,192,176,0.22),
-                0 0 100px rgba(200,192,176,0.09);
-            z-index: 12;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 200; text-decoration: none;
+            box-shadow: 0 4px 20px rgba(37,211,102,0.40);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: waPulse 3s ease-in-out infinite;
         }
-        .moon::before {
-            content: '';
-            position: absolute;
-            top: 20%; left: 28%;
-            width: 15px; height: 15px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.07);
+        .whatsapp-fab:hover {
+            transform: scale(1.12);
+            box-shadow: 0 6px 30px rgba(37,211,102,0.65);
+            animation: none;
         }
-        .moon::after {
-            content: '';
-            position: absolute;
-            top: 52%; left: 60%;
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.06);
+        .whatsapp-fab svg { width: 28px; height: 28px; fill: #fff; }
+        @keyframes waPulse {
+            0%,100% { box-shadow: 0 4px 20px rgba(37,211,102,0.40); }
+            50%     { box-shadow: 0 4px 30px rgba(37,211,102,0.75), 0 0 0 10px rgba(37,211,102,0.07); }
         }
 
-        /* ── Stars ── */
-        .stars-layer {
-            position: absolute; inset: 0;
-            z-index: 1; pointer-events: none;
-        }
-
-        /* ── Rain ── */
-        #rain-canvas {
-            position: absolute; inset: 0;
-            z-index: 7; pointer-events: none;
-            opacity: 0.55;
-        }
-
-        /* ── Fireflies ── */
-        @keyframes fireflyPulse {
-            0%,100% { opacity:0; transform:translate(0,0) scale(1); }
-            25%      { opacity:0.9; }
-            50%      { opacity:0.7; transform:translate(var(--ff-dx),var(--ff-dy)) scale(1.3); }
-            75%      { opacity:0.8; }
-        }
-        .ff {
-            position: absolute; border-radius: 50%;
-            background: var(--glow-warm);
-            box-shadow: 0 0 6px 2px rgba(240,184,96,0.55);
-            pointer-events: none; z-index: 8;
-            animation: fireflyPulse var(--ff-dur) var(--ff-del) infinite ease-in-out;
-        }
-
-        /* ── Trees ── */
-        .trees-layer {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 20vh;
-            z-index: 8; pointer-events: none;
-        }
-
-        /* ── Fog ── */
-        .fog-layer {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            height: 28%;
-            background: linear-gradient(to top, rgba(12,18,38,0.55) 0%, transparent 100%);
-            z-index: 11; pointer-events: none;
-        }
-
-        /* ── Ground glow ── */
-        .house-ground-glow {
-            position: absolute;
-            bottom: 18%; left: 50%; transform: translateX(-50%);
-            width: 760px; height: 90px;
-            background: radial-gradient(ellipse at center, rgba(212,160,80,0.10) 0%, transparent 70%);
-            z-index: 9; pointer-events: none;
-            filter: blur(10px);
-        }
-
-        /* ── Facade wrapper — anchored to bottom ── */
-        #facade-wrapper {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            transform-origin: bottom center;
-            z-index: 10;
-            transform-style: preserve-3d;
-            transition: transform 1.8s cubic-bezier(0.25,1,0.15,1);
-            width: 1000px; height: 700px;
-        }
-        #facade-wrapper.zoomed {
-            transform: translateX(-50%) scale(1.07) translateZ(100px);
-        }
-
-        /* ── Roof ── */
-        .house-roof {
-            position: absolute;
-            top: -171px; left: -52px; right: -52px;
-            height: 172px;
-            z-index: 20; pointer-events: none;
-        }
-        .house-roof svg { width: 100%; height: 100%; }
-
-        /* ── Chimney ── */
-        .chimney {
-            position: absolute;
-            top: -130px; left: 70%;
-            width: 32px; height: 92px;
-            background: #261a0c;
-            border: 1px solid rgba(80,50,15,0.45);
-            z-index: 25;
-        }
-        .chimney-cap {
-            position: absolute;
-            top: -7px; left: -7px; right: -7px;
-            height: 9px; background: #1e1208; border-radius: 2px;
-        }
-        @keyframes smokeRise {
-            0%   { opacity:0; transform:translateY(0) translateX(0) scale(0.4); }
-            20%  { opacity:0.55; }
-            80%  { opacity:0.25; }
-            100% { opacity:0; transform:translateY(-55px) translateX(9px) scale(2.8); }
-        }
-        .smoke {
-            position: absolute; border-radius: 50%;
-            background: rgba(140,152,168,0.38);
-            animation: smokeRise 4.5s infinite ease-out;
-        }
-
-        /* ── Facade structure ── */
-        .facade-structure {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(172deg, #2a2016 0%, #1e1a0e 38%, #17130708 100%);
-            border-radius: 4px 4px 8px 8px;
-            box-shadow:
-                0 60px 120px rgba(0,0,0,0.95),
-                inset 0 0 70px rgba(0,0,0,0.5),
-                0 0 0 2px #0f0c06;
-            display: grid;
-            grid-template-columns: repeat(3,1fr);
-            grid-template-rows: repeat(2,1fr);
-            gap: 60px 80px;
-            padding: 90px 140px;
-            transform-style: preserve-3d;
-        }
-        .facade-structure::after {
-            content: '';
-            position: absolute; inset: 0;
-            background: repeating-linear-gradient(
-                to bottom,
-                transparent 0px, transparent 30px,
-                rgba(0,0,0,0.035) 30px, rgba(0,0,0,0.035) 32px
-            );
-            pointer-events: none; border-radius: inherit; z-index: 0;
-        }
-
-        /* ── Facade overlay ── */
-        #facade-overlay {
-            position: absolute; inset: 0;
-            background: #000; opacity: 0;
-            pointer-events: none;
-            transition: opacity 1.5s ease;
-            border-radius: inherit; z-index: 20;
-        }
-        #facade-wrapper.zoomed #facade-overlay { opacity: 0.65; }
-
-        /* ── Windows ── */
-        .window-container {
-            position: relative; width: 100%; height: 100%;
-            transform-style: preserve-3d;
-            cursor: pointer; z-index: 15;
-        }
-        .window-frame {
-            position: absolute; inset: 0;
-            background: #0a0806;
-            border-radius: 200px 200px 0 0;
-            box-shadow:
-                inset 0 10px 24px rgba(0,0,0,0.95),
-                0 0 0 6px #1c1508,
-                0 0 0 8px #0a0806,
-                0 5px 14px rgba(0,0,0,0.7);
-            padding: 8px;
-            transform-style: preserve-3d;
-        }
-        .window-frame::before {
-            content: '';
-            position: absolute; inset: -5px;
-            border-radius: 205px 205px 0 0;
-            background: linear-gradient(to bottom, #30241200, #181008);
-            z-index: -1;
-        }
-        .window-interior-glow {
-            position: absolute; inset: 8px;
-            border-radius: 192px 192px 0 0;
-            background: radial-gradient(ellipse at 50% 22%,
-                #fcd878 0%, #e8943800 28%, #c05e1800 58%, #6a280800 82%, #2a100400 100%
-            );
-            opacity: 0.84;
-            transition: opacity 0.6s ease, box-shadow 0.6s ease;
-            box-shadow:
-                0 0 38px rgba(212,148,50,0.48),
-                0 0 72px rgba(212,148,50,0.16),
-                inset 0 -18px 28px rgba(0,0,0,0.62);
-        }
-        .window-container::after {
-            content: '';
-            position: absolute;
-            bottom: -52px; left: 50%; transform: translateX(-50%);
-            width: 72%; height: 52px;
-            background: radial-gradient(ellipse at top, rgba(212,148,50,0.16) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .window-container:hover .window-interior-glow {
-            opacity: 1;
-            box-shadow:
-                0 0 55px rgba(212,148,50,0.55),
-                0 0 95px rgba(212,148,50,0.22),
-                inset 0 -18px 28px rgba(0,0,0,0.62);
-        }
-
-        .pane-wrapper {
-            position: absolute; inset: 8px;
-            border-radius: 192px 192px 0 0;
-            transform-style: preserve-3d;
-            perspective: 800px;
-            pointer-events: none;
-        }
-        .pane {
-            position: absolute; top: 0; width: 50%; height: 100%;
-            background: rgba(18,14,10,0.85);
-            backdrop-filter: blur(2px);
-            border: 1px solid rgba(255,255,255,0.06);
-            transition: transform 0.8s cubic-bezier(0.25, 1, 0.15, 1);
-            transform-style: preserve-3d;
-        }
-        .pane.left {
-            left: 0; transform-origin: left center;
-            border-right: 1px solid #000;
-            border-radius: 192px 0 0 0;
-        }
-        .pane.right {
-            right: 0; transform-origin: right center;
-            border-left: 1px solid #000;
-            border-radius: 0 192px 0 0;
-        }
-        .pane-reflection {
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, rgba(255,255,255,0.02) 100%);
-            border-radius: inherit;
-        }
-        .pane::after  { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: #080604; }
-        .pane::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: #080604; }
-
-        .window-label {
-            position: absolute; bottom: -32px; left: 0; width: 100%;
-            text-align: center; font-size: 10px;
-            letter-spacing: 0.22em; text-transform: uppercase;
-            color: var(--text-warm); opacity: 0.5;
-            transition: opacity 0.3s ease;
-        }
-        .window-container:hover .window-label { opacity: 1; }
-
-        .window-container.is-active { z-index: 50; }
-        .window-container.is-active .pane.left  { transform: rotateY(-82deg); }
-        .window-container.is-active .pane.right { transform: rotateY(82deg); }
-
-        /* ── Interior panels ── */
+        /* ─── Interior panels ─── */
         #interiors-container {
-            position: absolute; inset: 0;
+            position: fixed; inset: 0;
             pointer-events: none;
             display: flex; align-items: center; justify-content: center;
             z-index: 100; perspective: 1500px;
@@ -399,6 +301,7 @@
             width: 840px; height: 560px;
             background: var(--panel-bg);
             backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--panel-border);
             border-radius: 6px;
             padding: 60px 70px;
@@ -446,10 +349,10 @@
             text-shadow: 0 2px 10px rgba(212,160,80,0.2);
         }
         .panel-subtitle {
-            font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em;
-            color: var(--glow-amber); margin-bottom: 12px; display: block;
+            font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.25em; color: var(--glow-amber);
+            margin-bottom: 12px; display: block;
         }
-
         .panel-body { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding-right: 16px; }
         .panel-body::-webkit-scrollbar { width: 4px; }
         .panel-body::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
@@ -459,21 +362,24 @@
         .prose p { margin-bottom: 1.2em; font-style: italic; }
         .prose p:first-of-type::first-letter {
             font-family: var(--font-display); font-size: 3.5em; float: left;
-            line-height: 0.8; padding-right: 8px; color: var(--glow-amber); font-style: normal;
+            line-height: 0.8; padding-right: 8px;
+            color: var(--glow-amber); font-style: normal;
         }
 
-        /* ── Services grid ── */
         .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .service-card {
             border: 1px solid rgba(212,160,80,0.1); padding: 24px;
             background: linear-gradient(to bottom, rgba(255,255,255,0.02), transparent);
             transition: all 0.3s ease;
         }
-        .service-card:hover { border-color: rgba(212,160,80,0.3); background: rgba(212,160,80,0.05); transform: translateY(-3px); }
+        .service-card:hover {
+            border-color: rgba(212,160,80,0.3);
+            background: rgba(212,160,80,0.05);
+            transform: translateY(-3px);
+        }
         .service-title { font-family: var(--font-display); font-size: 18px; color: var(--glow-amber); margin-bottom: 12px; }
-        .service-desc { font-family: var(--font-ui); font-size: 13px; line-height: 1.6; color: #a8a098; }
+        .service-desc  { font-family: var(--font-ui); font-size: 13px; line-height: 1.6; color: #a8a098; }
 
-        /* ── Process grid ── */
         .process-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
         .process-step { position: relative; padding-left: 48px; }
         .step-num {
@@ -482,241 +388,151 @@
             color: rgba(212,160,80,0.2); line-height: 1;
         }
         .step-title { font-family: var(--font-display); font-size: 16px; color: var(--text-pure); margin-bottom: 8px; }
-        .step-desc { font-family: var(--font-ui); font-size: 13px; color: #a8a098; line-height: 1.5; }
+        .step-desc  { font-family: var(--font-ui); font-size: 13px; color: #a8a098; line-height: 1.5; }
 
-        /* ── Portfolio grid ── */
         .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .port-item {
-            aspect-ratio: 4/5; background: #1a1510; border: 1px solid rgba(255,255,255,0.05);
+            aspect-ratio: 4/5; background: #1a1510;
+            border: 1px solid rgba(255,255,255,0.05);
             position: relative; overflow: hidden; cursor: pointer;
         }
         .port-item div.img-placeholder { width: 100%; height: 100%; opacity: 0.6; transition: opacity 0.5s, transform 0.8s; }
         .port-item:hover div.img-placeholder { opacity: 1; transform: scale(1.05); }
         .port-overlay {
-            position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,8,5,0.9), transparent);
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 16px;
-            opacity: 0; transition: opacity 0.4s;
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(10,8,5,0.9), transparent);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 16px; opacity: 0; transition: opacity 0.4s;
         }
         .port-item:hover .port-overlay { opacity: 1; }
         .port-title { font-family: var(--font-display); font-size: 14px; color: var(--glow-amber); }
-        .port-cat { font-family: var(--font-ui); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #a8a098; }
+        .port-cat   { font-family: var(--font-ui); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #a8a098; }
 
-        /* ── Testimonials ── */
         .testi-list { display: flex; flex-direction: column; gap: 32px; }
         .testi-item { position: relative; padding-left: 24px; border-left: 1px solid rgba(212,160,80,0.2); }
-        .testi-quote { font-family: var(--font-body); font-style: italic; font-size: 20px; color: var(--text-light); line-height: 1.6; margin-bottom: 12px; }
+        .testi-quote  { font-family: var(--font-body); font-style: italic; font-size: 20px; color: var(--text-light); line-height: 1.6; margin-bottom: 12px; }
         .testi-author { font-family: var(--font-ui); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--glow-amber); }
 
-        /* ── Contact ── */
         .contact-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; }
         .form-group { margin-bottom: 24px; }
         .form-label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-warm); margin-bottom: 8px; }
         .form-input, .form-textarea {
-            width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
-            padding: 12px 0; color: var(--text-pure); font-family: var(--font-body); font-size: 18px; font-style: italic;
+            width: 100%; background: transparent; border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding: 12px 0; color: var(--text-pure);
+            font-family: var(--font-body); font-size: 18px; font-style: italic;
             transition: border-color 0.3s; resize: none; outline: none;
         }
         .form-input:focus, .form-textarea:focus { border-color: var(--glow-amber); }
         .btn-submit {
-            background: transparent; border: 1px solid var(--glow-amber); color: var(--glow-amber);
-            font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em;
+            background: transparent; border: 1px solid var(--glow-amber);
+            color: var(--glow-amber); font-family: var(--font-display);
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em;
             padding: 14px 32px; cursor: pointer; transition: all 0.3s; margin-top: 16px;
         }
-        .btn-submit:hover { background: var(--glow-amber); color: var(--house-dark); }
+        .btn-submit:hover { background: var(--glow-amber); color: #181208; }
 
         .contact-info { display: flex; flex-direction: column; gap: 32px; padding-top: 24px; }
-        .info-block { display: flex; flex-direction: column; gap: 8px; }
-        .info-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: #a8a098; }
-        .info-value { font-family: var(--font-display); font-size: 16px; color: var(--text-pure); }
-        /* ── WhatsApp FAB ── */
-        .whatsapp-fab {
-            position: fixed;
-            bottom: 28px; right: 28px;
-            width: 56px; height: 56px;
-            background: #25D366;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 200;
-            text-decoration: none;
-            box-shadow: 0 4px 20px rgba(37,211,102,0.40);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: waPulse 3s ease-in-out infinite;
-        }
-        .whatsapp-fab:hover {
-            transform: scale(1.12);
-            box-shadow: 0 6px 30px rgba(37,211,102,0.65);
-            animation: none;
-        }
-        .whatsapp-fab svg { width: 28px; height: 28px; fill: #fff; }
-        @keyframes waPulse {
-            0%, 100% { box-shadow: 0 4px 20px rgba(37,211,102,0.40); }
-            50%       { box-shadow: 0 4px 30px rgba(37,211,102,0.75), 0 0 0 10px rgba(37,211,102,0.07); }
-        }
+        .info-block   { display: flex; flex-direction: column; gap: 8px; }
+        .info-label   { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: #a8a098; }
+        .info-value   { font-family: var(--font-display); font-size: 16px; color: var(--text-pure); }
 
-        /* ── Mobile ── */
+        /* ─── Mobile ─── */
         @media (max-width: 767px) {
-            .global-header {
-                top: 20px; left: 18px; right: 18px;
-            }
-            .logo-tagline { display: none; }
-            .nav-links    { display: none; }
-            .nav-controls { display: none; }
+            .global-header { top: 20px; left: 18px; right: 18px; }
+            .logo-tagline  { display: none; }
 
-            .moon {
-                width: 58px; height: 58px;
-                top: 7%; right: 5%;
-            }
+            .welcome-overlay { top: 10%; left: 5%; }
+            .welcome-title   { font-size: 22px; }
+            .welcome-pre     { font-size: 9px; letter-spacing: 0.25em; }
+
+            .hotspot-label   { font-size: 9px; padding: 5px 13px; letter-spacing: 0.16em; }
+            .hotspot-dot     { width: 6px; height: 6px; }
+
+            .audio-toggle  { bottom: 20px; right: 78px; width: 40px; height: 40px; }
+            .audio-toggle svg { width: 14px; height: 14px; }
 
             .interior-panel {
-                width: 100vw;
-                height: 100dvh;
-                border-radius: 0;
-                padding: 56px 22px 28px;
-                position: fixed;
-                top: 0; left: 0;
+                width: 100vw; height: 100dvh;
+                border-radius: 0; padding: 56px 22px 28px;
+                position: fixed; top: 0; left: 0;
                 transform: translateY(40px) !important;
             }
-            .interior-panel.is-visible {
-                transform: translateY(0) !important;
-            }
-            .panel-title   { font-size: 26px; }
-            .prose         { font-size: 16px; }
-            .services-grid { grid-template-columns: 1fr; }
-            .process-grid  { grid-template-columns: 1fr; gap: 20px; }
+            .interior-panel.is-visible { transform: translateY(0) !important; }
+
+            .panel-title    { font-size: 26px; }
+            .prose          { font-size: 16px; }
+            .services-grid  { grid-template-columns: 1fr; }
+            .process-grid   { grid-template-columns: 1fr; gap: 20px; }
             .portfolio-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .contact-layout { grid-template-columns: 1fr; gap: 28px; }
-            .testi-quote   { font-size: 17px; }
+            .testi-quote    { font-size: 17px; }
 
-            .whatsapp-fab { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+            .whatsapp-fab     { bottom: 20px; right: 20px; width: 50px; height: 50px; }
             .whatsapp-fab svg { width: 24px; height: 24px; }
         }
     </style>
 </head>
 <body>
 
-    <header class="global-header">
-        <div class="logo-cluster">
-            <div class="logo-mark">H</div>
-            <div class="logo-text-cluster">
-                <span class="logo-name">Home Psyche</span>
-                <span class="logo-tagline">Design de Interiores</span>
-            </div>
-            <div class="nav-links">
-                <a href="#" class="nav-link">Studio</a>
-                <a href="#" class="nav-link">Journal</a>
-            </div>
-        </div>
-        <div class="nav-controls">
-            <div class="icon-btn">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg>
-            </div>
-            <div class="icon-btn">
-                <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"></path></svg>
-            </div>
-        </div>
-    </header>
 
     <div id="scene-container">
-        <div class="sky-bg"></div>
-        <div class="stars-layer"></div>
-        <div class="moon"></div>
+
+        <!-- Fundo: foto da casa. Substitua './casa.jpg' pelo arquivo real. -->
+        <div class="photo-bg"></div>
+
         <canvas id="rain-canvas"></canvas>
-        <svg class="trees-layer" viewBox="0 0 1440 200" preserveAspectRatio="none">
-            <path fill="#07101e" opacity="0.6" d="M0,200 L0,100 Q50,90 100,120 T250,90 T400,130 T600,80 T800,140 T1000,90 T1200,120 T1440,80 L1440,200 Z"></path>
-            <path fill="#050a12" opacity="0.9" d="M0,200 L0,130 Q80,110 150,150 T350,110 T500,160 T700,110 T950,160 T1150,110 T1440,140 L1440,200 Z"></path>
-        </svg>
-        <div class="fog-layer"></div>
-        <div class="house-ground-glow"></div>
 
-        <div id="facade-wrapper">
-            <div class="house-roof">
-                <svg viewBox="0 0 1104 172" preserveAspectRatio="none">
-                    <path d="M552,0 L1104,172 L0,172 Z" fill="#0e0b05"></path>
-                    <path d="M552,0 L1104,172 L0,172 Z" fill="url(#roof-grad)" opacity="0.3"></path>
-                    <defs>
-                        <linearGradient id="roof-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#2a2016"></stop>
-                            <stop offset="100%" stop-color="#0e0b05" stop-opacity="0"></stop>
-                        </linearGradient>
-                    </defs>
-                </svg>
+        <!-- Texto de boas-vindas — canto superior esquerdo sobre a foto -->
+        <div class="welcome-overlay">
+            <span class="welcome-pre">bem-vindo à</span>
+            <span class="welcome-title">Home Psyche</span>
+        </div>
+
+        <!-- Hotspots sobre as janelas da foto.
+             Ajuste top/left de cada .hotspot após colocar a foto real. -->
+        <div id="hotspots-layer">
+            <!-- Janela mansarda (topo centro) -->
+            <div class="hotspot" data-target="contact"      style="top:13%;left:50%">
+                <div class="hotspot-dot"></div>
+                <span class="hotspot-label">Contato</span>
             </div>
-
-            <div class="chimney">
-                <div class="chimney-cap"></div>
+            <!-- Janela superior esquerda (estante de livros) -->
+            <div class="hotspot" data-target="services"     style="top:36%;left:34%">
+                <div class="hotspot-dot"></div>
+                <span class="hotspot-label">Serviços</span>
             </div>
-
-            <div class="facade-structure">
-                <div id="facade-overlay"></div>
-
-                <div class="window-container" data-target="about">
-                    <div class="window-frame">
-                        <div class="window-interior-glow"></div>
-                        <div class="pane-wrapper">
-                            <div class="pane left"><div class="pane-reflection"></div></div>
-                            <div class="pane right"><div class="pane-reflection"></div></div>
-                        </div>
-                    </div>
-                    <div class="window-label">About</div>
-                </div>
-
-                <div class="window-container" data-target="services">
-                    <div class="window-frame">
-                        <div class="window-interior-glow"></div>
-                        <div class="pane-wrapper">
-                            <div class="pane left"><div class="pane-reflection"></div></div>
-                            <div class="pane right"><div class="pane-reflection"></div></div>
-                        </div>
-                    </div>
-                    <div class="window-label">Services</div>
-                </div>
-
-                <div class="window-container" data-target="process">
-                    <div class="window-frame">
-                        <div class="window-interior-glow"></div>
-                        <div class="pane-wrapper">
-                            <div class="pane left"><div class="pane-reflection"></div></div>
-                            <div class="pane right"><div class="pane-reflection"></div></div>
-                        </div>
-                    </div>
-                    <div class="window-label">Process</div>
-                </div>
-
-                <div class="window-container" data-target="portfolio">
-                    <div class="window-frame">
-                        <div class="window-interior-glow"></div>
-                        <div class="pane-wrapper">
-                            <div class="pane left"><div class="pane-reflection"></div></div>
-                            <div class="pane right"><div class="pane-reflection"></div></div>
-                        </div>
-                    </div>
-                    <div class="window-label">Portfolio</div>
-                </div>
-
-                <div class="window-container" data-target="testimonials">
-                    <div class="window-frame">
-                        <div class="window-interior-glow"></div>
-                        <div class="pane-wrapper">
-                            <div class="pane left"><div class="pane-reflection"></div></div>
-                            <div class="pane right"><div class="pane-reflection"></div></div>
-                        </div>
-                    </div>
-                    <div class="window-label">Testimonials</div>
-                </div>
-
-                <div class="window-container" data-target="contact">
-                    <div class="window-frame">
-                        <div class="window-interior-glow"></div>
-                        <div class="pane-wrapper">
-                            <div class="pane left"><div class="pane-reflection"></div></div>
-                            <div class="pane right"><div class="pane-reflection"></div></div>
-                        </div>
-                    </div>
-                    <div class="window-label">Contact</div>
-                </div>
+            <!-- Janela superior direita (bay window âmbar) -->
+            <div class="hotspot" data-target="portfolio"    style="top:36%;left:67%">
+                <div class="hotspot-dot"></div>
+                <span class="hotspot-label">Projetos</span>
+            </div>
+            <!-- Janela inferior esquerda (ateliê / pincéis) -->
+            <div class="hotspot" data-target="process"      style="top:72%;left:32%">
+                <div class="hotspot-dot"></div>
+                <span class="hotspot-label">Processo</span>
+            </div>
+            <!-- Janela inferior centro (personagem pintando — dona do site) -->
+            <div class="hotspot" data-target="about"        style="top:60%;left:51%">
+                <div class="hotspot-dot"></div>
+                <span class="hotspot-label">Sobre mim</span>
+            </div>
+            <!-- Janela inferior direita (tecidos coloridos) -->
+            <div class="hotspot" data-target="testimonials" style="top:62%;left:79%">
+                <div class="hotspot-dot"></div>
+                <span class="hotspot-label">Inspirações</span>
             </div>
         </div>
 
+        <!-- Slot reservado para o personagem animado (WebM ou Lottie).
+             Definir top/left/width/height após receber o asset. -->
+        <div id="character-slot"></div>
+
+        <!-- Áudio ambiente. Coloque chuva.mp3 na mesma pasta.
+             O botão abaixo controla play/pause. Não inicia sozinho (política dos navegadores). -->
+        <audio id="ambient-audio" loop src="./chuva.mp3" preload="none"></audio>
+
+        <!-- Painéis de conteúdo -->
         <div id="interiors-container">
 
             <div class="interior-panel" id="panel-about">
@@ -803,42 +619,42 @@
                 <div class="panel-body">
                     <div class="portfolio-grid">
                         <div class="port-item">
-                            <div class="img-placeholder" style="background: #2a2016;"></div>
+                            <div class="img-placeholder" style="background:#2a2016;"></div>
                             <div class="port-overlay">
                                 <span class="port-cat">Residencial</span>
                                 <h3 class="port-title">Refúgio Âmbar</h3>
                             </div>
                         </div>
                         <div class="port-item">
-                            <div class="img-placeholder" style="background: #1e1a0e;"></div>
+                            <div class="img-placeholder" style="background:#1e1a0e;"></div>
                             <div class="port-overlay">
                                 <span class="port-cat">Comercial</span>
                                 <h3 class="port-title">Clínica Sereno</h3>
                             </div>
                         </div>
                         <div class="port-item">
-                            <div class="img-placeholder" style="background: #171307;"></div>
+                            <div class="img-placeholder" style="background:#171307;"></div>
                             <div class="port-overlay">
                                 <span class="port-cat">Residencial</span>
                                 <h3 class="port-title">Casa Sombra</h3>
                             </div>
                         </div>
                         <div class="port-item">
-                            <div class="img-placeholder" style="background: #3a2e24;"></div>
+                            <div class="img-placeholder" style="background:#3a2e24;"></div>
                             <div class="port-overlay">
                                 <span class="port-cat">Hospitalidade</span>
                                 <h3 class="port-title">Pousada Vento</h3>
                             </div>
                         </div>
                         <div class="port-item">
-                            <div class="img-placeholder" style="background: #231b0e;"></div>
+                            <div class="img-placeholder" style="background:#231b0e;"></div>
                             <div class="port-overlay">
                                 <span class="port-cat">Residencial</span>
                                 <h3 class="port-title">Loft Tátil</h3>
                             </div>
                         </div>
                         <div class="port-item">
-                            <div class="img-placeholder" style="background: #181208;"></div>
+                            <div class="img-placeholder" style="background:#181208;"></div>
                             <div class="port-overlay">
                                 <span class="port-cat">Intervenção</span>
                                 <h3 class="port-title">Estúdio Silêncio</h3>
@@ -916,6 +732,16 @@
         </div>
     </div>
 
+    <!-- Botão de áudio ambiente -->
+    <button class="audio-toggle" id="audio-toggle" title="Som ambiente" aria-label="Ativar som ambiente">
+        <svg id="icon-sound-on" viewBox="0 0 24 24">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+    </button>
+
+    <!-- WhatsApp FAB -->
     <a class="whatsapp-fab" href="https://wa.me/5511947190354" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
@@ -925,159 +751,133 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            /* Stars */
-            const starsLayer = document.querySelector('.stars-layer');
-            for(let i = 0; i < 150; i++) {
-                const star = document.createElement('div');
-                star.style.cssText = `position:absolute;left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*2+1}px;height:${Math.random()*2+1}px;background:#fff;border-radius:50%;opacity:${Math.random()*0.8+0.2}`;
-                starsLayer.appendChild(star);
-            }
-
-            /* Fireflies */
-            const sceneContainer = document.getElementById('scene-container');
-            for(let i = 0; i < 40; i++) {
+            /* ── Fireflies (8) ── */
+            const scene = document.getElementById('scene-container');
+            for (let i = 0; i < 8; i++) {
                 const ff = document.createElement('div');
                 ff.className = 'ff';
-                ff.style.left   = `${Math.random()*100}%`;
-                ff.style.top    = `${50 + Math.random()*50}%`;
-                ff.style.width  = ff.style.height = `${Math.random()*3+1}px`;
-                ff.style.setProperty('--ff-dx',  `${(Math.random()-0.5)*100}px`);
-                ff.style.setProperty('--ff-dy',  `${(Math.random()-0.5)*100}px`);
-                ff.style.setProperty('--ff-dur', `${3+Math.random()*4}s`);
-                ff.style.setProperty('--ff-del', `${Math.random()*5}s`);
-                sceneContainer.appendChild(ff);
+                ff.style.left   = `${10 + Math.random() * 80}%`;
+                ff.style.top    = `${30 + Math.random() * 60}%`;
+                ff.style.width  = ff.style.height = `${Math.random() * 4 + 2}px`;
+                ff.style.setProperty('--ff-dx',  `${(Math.random() - 0.5) * 80}px`);
+                ff.style.setProperty('--ff-dy',  `${(Math.random() - 0.5) * 80}px`);
+                ff.style.setProperty('--ff-dur', `${3 + Math.random() * 5}s`);
+                ff.style.setProperty('--ff-del', `${Math.random() * 6}s`);
+                scene.appendChild(ff);
             }
 
-            /* Chimney smoke */
-            const chimney = document.querySelector('.chimney');
-            setInterval(() => {
-                const smoke = document.createElement('div');
-                smoke.className = 'smoke';
-                smoke.style.width  = smoke.style.height = `${Math.random()*10+10}px`;
-                smoke.style.left   = `${Math.random()*10+5}px`;
-                smoke.style.top    = '-10px';
-                chimney.appendChild(smoke);
-                setTimeout(() => smoke.remove(), 4500);
-            }, 800);
-
-            /* Rain */
+            /* ── Rain canvas ── */
             const canvas = document.getElementById('rain-canvas');
-            const ctx = canvas.getContext('2d');
+            const ctx    = canvas.getContext('2d');
             let width, height, particles = [];
 
             function resize() {
-                width = canvas.width = window.innerWidth;
+                width  = canvas.width  = window.innerWidth;
                 height = canvas.height = window.innerHeight;
             }
             function initRain() {
                 particles = [];
-                for(let i = 0; i < 150; i++) {
+                for (let i = 0; i < 220; i++) {
                     particles.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        length:  Math.random() * 20 + 10,
-                        speed:   Math.random() * 15 + 10,
-                        opacity: Math.random() * 0.3 + 0.1
+                        length:  Math.random() * 22 + 8,
+                        speed:   Math.random() * 14 + 8,
+                        opacity: Math.random() * 0.45 + 0.2
                     });
                 }
             }
             function drawRain() {
                 ctx.clearRect(0, 0, width, height);
-                ctx.lineWidth = 1;
-                ctx.lineCap = 'round';
+                ctx.lineWidth = 0.8; ctx.lineCap = 'round';
                 particles.forEach(p => {
                     ctx.beginPath();
                     ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p.x - p.length * 0.2, p.y + p.length);
-                    const grad = ctx.createLinearGradient(p.x, p.y, p.x - p.length*0.2, p.y + p.length);
-                    grad.addColorStop(0,   `rgba(255,255,255,0)`);
-                    grad.addColorStop(0.5, `rgba(212,160,80,${p.opacity})`);
-                    grad.addColorStop(1,   `rgba(255,255,255,0)`);
-                    ctx.strokeStyle = grad;
+                    ctx.lineTo(p.x - p.length * 0.18, p.y + p.length);
+                    const g = ctx.createLinearGradient(p.x, p.y, p.x - p.length * 0.18, p.y + p.length);
+                    g.addColorStop(0,   'rgba(200,225,255,0)');
+                    g.addColorStop(0.4, `rgba(200,225,255,${p.opacity})`);
+                    g.addColorStop(1,   'rgba(200,225,255,0)');
+                    ctx.strokeStyle = g;
                     ctx.stroke();
                     p.y += p.speed;
-                    p.x -= p.speed * 0.2;
-                    if(p.y > height) { p.y = -p.length; p.x = Math.random() * width; }
+                    p.x -= p.speed * 0.18;
+                    if (p.y > height) { p.y = -p.length; p.x = Math.random() * width; }
                 });
                 requestAnimationFrame(drawRain);
             }
-            window.addEventListener('resize', () => { resize(); initRain(); });
             resize(); initRain(); drawRain();
+            window.addEventListener('resize', () => { resize(); initRain(); });
 
-            /* ── Responsive facade scale ── */
-            const facadeWrapper = document.getElementById('facade-wrapper');
-            const windows       = document.querySelectorAll('.window-container');
-            const closeBtns     = document.querySelectorAll('.close-panel');
-            let isAnimating  = false;
-            let activeWindow = null;
-            let facadeScale  = 1;
-            const isTouch = ('ontouchstart' in window) || window.matchMedia('(pointer: coarse)').matches;
+            /* ── Hotspot / panel interaction ── */
+            const photoBg   = document.querySelector('.photo-bg');
+            const hotspots  = document.querySelectorAll('.hotspot');
+            const closeBtns = document.querySelectorAll('.close-panel');
+            let isAnimating   = false;
+            let activeHotspot = null;
 
-            function updateFacadeScale() {
-                const vw = window.innerWidth;
-                if      (vw < 480) facadeScale = Math.max(0.28, (vw * 0.90) / 1000);
-                else if (vw < 768) facadeScale = 0.68;
-                else               facadeScale = 1;
-                if (!activeWindow) applyBaseTransform();
-            }
+            hotspots.forEach(hs => {
+                hs.addEventListener('click', () => {
+                    if (isAnimating || activeHotspot) return;
+                    isAnimating   = true;
+                    activeHotspot = hs;
+                    hs.classList.add('is-active');
 
-            function applyBaseTransform() {
-                facadeWrapper.style.transform = `translateX(-50%) scale(${facadeScale})`;
-            }
+                    /* B — zoom da foto em direção à janela clicada */
+                    const rect = hs.getBoundingClientRect();
+                    const cx = ((rect.left + rect.width  / 2) / window.innerWidth  * 100).toFixed(1);
+                    const cy = ((rect.top  + rect.height / 2) / window.innerHeight * 100).toFixed(1);
+                    photoBg.style.transformOrigin = `${cx}% ${cy}%`;
+                    photoBg.classList.add('zoomed');
 
-            windows.forEach(win => {
-                win.addEventListener('click', () => {
-                    if(isAnimating || activeWindow) return;
-                    isAnimating = true;
-                    activeWindow = win;
+                    /* A — bloom de luz âmbar a partir do hotspot */
+                    const bloom = document.createElement('div');
+                    bloom.className = 'bloom';
+                    bloom.style.left = `${rect.left + rect.width  / 2}px`;
+                    bloom.style.top  = `${rect.top  + rect.height / 2}px`;
+                    document.body.appendChild(bloom);
+                    requestAnimationFrame(() => requestAnimationFrame(() => bloom.classList.add('expanding')));
 
-                    const targetId = win.getAttribute('data-target');
-                    const panel = document.getElementById(`panel-${targetId}`);
-
-                    win.classList.add('is-active');
-                    facadeWrapper.style.transform = `translateX(-50%) scale(${facadeScale * 1.05}) translateZ(80px)`;
-
+                    /* Painel abre quando bloom está no auge */
                     setTimeout(() => {
-                        if(panel) panel.classList.add('is-visible');
+                        const panel = document.getElementById(`panel-${hs.dataset.target}`);
+                        if (panel) panel.classList.add('is-visible');
+                        bloom.classList.add('fading');
+                        setTimeout(() => bloom.remove(), 500);
                         isAnimating = false;
-                    }, 800);
+                    }, 620);
                 });
             });
 
             closeBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    if(isAnimating) return;
+                btn.addEventListener('click', e => {
+                    if (isAnimating) return;
                     isAnimating = true;
-
                     const panel = e.target.closest('.interior-panel');
                     panel.classList.remove('is-visible');
-
+                    photoBg.classList.remove('zoomed');
                     setTimeout(() => {
-                        if(activeWindow) {
-                            activeWindow.classList.remove('is-active');
-                            activeWindow = null;
+                        if (activeHotspot) {
+                            activeHotspot.classList.remove('is-active');
+                            activeHotspot = null;
                         }
-                        applyBaseTransform();
                         isAnimating = false;
-                    }, 500);
+                    }, 600);
                 });
             });
 
-            /* Parallax — only on pointer devices */
-            if (!isTouch) {
-                document.addEventListener('mousemove', (e) => {
-                    if(activeWindow) return;
-                    const xAxis = (window.innerWidth  / 2 - e.pageX) / 80;
-                    const yAxis = (window.innerHeight / 2 - e.pageY) / 80;
-                    facadeWrapper.style.transform = `translateX(-50%) scale(${facadeScale}) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-                });
-                document.addEventListener('mouseleave', () => {
-                    if(!activeWindow) applyBaseTransform();
-                });
-            }
-
-            window.addEventListener('resize', () => { resize(); initRain(); updateFacadeScale(); });
-            updateFacadeScale();
+            /* ── Audio toggle ── */
+            const audio    = document.getElementById('ambient-audio');
+            const audioBtn = document.getElementById('audio-toggle');
+            audioBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play().catch(() => {});
+                    audioBtn.classList.add('is-playing');
+                } else {
+                    audio.pause();
+                    audioBtn.classList.remove('is-playing');
+                }
+            });
         });
     </script>
 
